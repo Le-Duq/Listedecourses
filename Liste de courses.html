@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liste de Courses</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 80%;
+      max-width: 600px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .input-container {
+      position: relative;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 5px;
+    }
+    button {
+      padding: 10px;
+      background-color: #28a745;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .suggestions {
+      position: absolute;
+      width: 80%;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1000;
+    }
+    .suggestions div {
+      padding: 10px;
+      cursor: pointer;
+    }
+    .suggestions div:hover {
+      background: #f1f1f1;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    li {
+      background: #eee;
+      padding: 10px;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .delete {
+      background: #dc3545;
+      border: none;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .delete:hover {
+      background: #c82333;
+    }
+    .checkbox {
+      margin-right: 10px;
+    }
+    .checked {
+      text-decoration: line-through;
+      color: gray;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ma Liste de Courses</h1>
+    <div class="input-container">
+      <input type="text" id="itemInput" placeholder="Ajouter un article" oninput="showSuggestions()">
+      <div class="suggestions" id="suggestionsList"></div>
+    </div>
+    <button onclick="addItem()">Ajouter</button>
+    <ul id="shoppingList"></ul>
+  </div>
+
+  <script>
+    const ingredients = [
+      "Abricot", "Ail", "Ananas", "Avocat", "Banane", "Cassis", "Cerise", "Citron", "Clémentine", "Coing", 
+      "Datte", "Figue", "Fraise", "Framboise", "Goyave", "Grenade", "Kaki", "Kiwi", "Litchi", "Mangue",
+      "Melon", "Mûre", "Orange", "Pastèque", "Pêche", "Poire", "Pomme", "Prune", "Raisin", "Rhubarbe",
+      "Aubergine", "Brocoli", "Carotte", "Champignon", "Chou", "Concombre", "Courgette", "Haricot vert",
+      "Laitue", "Navet", "Oignon", "Poireau", "Poivron", "Pomme de terre", "Radis", "Tomate", "Bœuf",
+      "Poulet", "Porc", "Veau", "Saumon", "Thon", "Crevette", "Cabillaud", "Jambon", "Lardon", "Salade",
+      "Huile d’olive", "Mayonnaise", "Moutarde", "Sauce tomate", "Ketchup", "Vinaigre balsamique", 
+      "Beurre", "Lait", "Yaourt", "Fromage", "Œufs", "Riz", "Pâtes", "Semoule", "Pain", "Farine", 
+      "Sucre", "Chocolat", "Confiture", "Miel", "Café", "Thé", "Jus de fruits", "Eau gazeuse", "Soda", 
+      "Bière", "Vin", "Poivre", "Sel", "Origan", "Cannelle", "Basilic", "Chips", "Biscuits", 
+      "Cacahuètes", "Olives", "Dentifrice", "Shampoing", "Savon", "Gel douche", "Lessive", 
+      "Papier toilette", "Produit vaisselle"
+    ];
+
+    document.addEventListener("DOMContentLoaded", loadItems);
+
+    function showSuggestions() {
+      let input = document.getElementById("itemInput").value.toLowerCase();
+      let suggestionsDiv = document.getElementById("suggestionsList");
+      suggestionsDiv.innerHTML = "";
+
+      if (input.length > 0) {
+        let matches = ingredients.filter(item => item.toLowerCase().startsWith(input));
+
+        if (matches.length > 0) {
+          suggestionsDiv.style.display = "block";
+          matches.forEach(match => {
+            let div = document.createElement("div");
+            div.textContent = match;
+            div.onclick = function () {
+              document.getElementById("itemInput").value = match;
+              suggestionsDiv.style.display = "none";
+            };
+            suggestionsDiv.appendChild(div);
+          });
+        } else {
+          suggestionsDiv.style.display = "none";
+        }
+      } else {
+        suggestionsDiv.style.display = "none";
+      }
+    }
+
+    function addItem() {
+      let input = document.getElementById('itemInput');
+      let item = input.value.trim();
+      let suggestionsDiv = document.getElementById("suggestionsList");
+
+      if (item !== '') {
+        createListItem(item);
+        saveItem(item);
+        input.value = '';
+        suggestionsDiv.style.display = "none";
+      }
+    }
+
+    function createListItem(item) {
+      let li = document.createElement('li');
+
+      let checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "checkbox";
+      checkbox.onclick = function() {
+        li.classList.toggle("checked", checkbox.checked);
+      };
+
+      let span = document.createElement("span");
+      span.textContent = item;
+
+      let btn = document.createElement('button');
+      btn.textContent = 'Supprimer';
+      btn.className = 'delete';
+      btn.onclick = function() {
+        removeItem(item);
+        li.remove();
+      };
+
+      li.appendChild(checkbox);
+      li.appendChild(span);
+      li.appendChild(btn);
+      document.getElementById('shoppingList').appendChild(li);
+    }
+
+    function saveItem(item) {
+      let items = JSON.parse(localStorage.getItem('shoppingList')) || [];
+      items.push(item);
+      localStorage.setItem('shoppingList', JSON.stringify(items));
+    }
+
+    function removeItem(item) {
+      let items = JSON.parse(localStorage.getItem('shoppingList')) || [];
+      let newItems = items.filter(i => i !== item);
+      localStorage.setItem('shoppingList', JSON.stringify(newItems));
+    }
+
+    function loadItems() {
+      let items = JSON.parse(localStorage.getItem('shoppingList')) || [];
+      items.forEach(createListItem);
+    }
+  </script>
+</body>
+</html>
