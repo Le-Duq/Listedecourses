@@ -1,212 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Liste de Courses</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      width: 80%;
-      max-width: 600px;
-      margin: 30px auto;
-      background: #fff;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    .input-container {
-      position: relative;
-    }
-    input[type="text"] {
-      width: 80%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-right: 5px;
-    }
-    button {
-      padding: 10px;
-      background-color: #28a745;
-      border: none;
-      border-radius: 4px;
-      color: #fff;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
-    }
-    .suggestions {
-      position: absolute;
-      width: 80%;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      max-height: 200px;
-      overflow-y: auto;
-      display: none;
-      z-index: 1000;
-    }
-    .suggestions div {
-      padding: 10px;
-      cursor: pointer;
-    }
-    .suggestions div:hover {
-      background: #f1f1f1;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-      margin-top: 20px;
-    }
-    li {
-      background: #eee;
-      padding: 10px;
-      margin-bottom: 5px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .delete {
-      background: #dc3545;
-      border: none;
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .delete:hover {
-      background: #c82333;
-    }
-    .checkbox {
-      margin-right: 10px;
-    }
-    .checked {
-      text-decoration: line-through;
-      color: gray;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Ma Liste de Courses</h1>
-    <div class="input-container">
-      <input type="text" id="itemInput" placeholder="Ajouter un article" oninput="showSuggestions()">
-      <div class="suggestions" id="suggestionsList"></div>
-    </div>
-    <button onclick="addItem()">Ajouter</button>
-    <ul id="shoppingList"></ul>
-  </div>
-
-  <script>
-    const ingredients = [
-      "Abricot", "Ail", "Ananas", "Avocat", "Banane", "Cassis", "Cerise", "Citron", "Clémentine", "Coing", 
-      "Datte", "Figue", "Fraise", "Framboise", "Goyave", "Grenade", "Kaki", "Kiwi", "Litchi", "Mangue",
-      "Melon", "Mûre", "Orange", "Pastèque", "Pêche", "Poire", "Pomme", "Prune", "Raisin", "Rhubarbe",
-      "Aubergine", "Brocoli", "Carotte", "Champignon", "Chou", "Concombre", "Courgette", "Haricot vert",
-      "Laitue", "Navet", "Oignon", "Poireau", "Poivron", "Pomme de terre", "Radis", "Tomate", "Bœuf",
-      "Poulet", "Porc", "Veau", "Saumon", "Thon", "Crevette", "Cabillaud", "Jambon", "Lardon", "Salade",
-      "Huile d’olive", "Mayonnaise", "Moutarde", "Sauce tomate", "Ketchup", "Vinaigre balsamique", 
-      "Beurre", "Lait", "Yaourt", "Fromage", "Œufs", "Riz", "Pâtes", "Semoule", "Pain", "Farine", 
-      "Sucre", "Chocolat", "Confiture", "Miel", "Café", "Thé", "Jus de fruits", "Eau gazeuse", "Soda", 
-      "Bière", "Vin", "Poivre", "Sel", "Origan", "Cannelle", "Basilic", "Chips", "Biscuits", 
-      "Cacahuètes", "Olives", "Dentifrice", "Shampoing", "Savon", "Gel douche", "Lessive", 
-      "Papier toilette", "Produit vaisselle"
-    ];
-
-    document.addEventListener("DOMContentLoaded", loadItems);
-
-    function showSuggestions() {
-      let input = document.getElementById("itemInput").value.toLowerCase();
-      let suggestionsDiv = document.getElementById("suggestionsList");
-      suggestionsDiv.innerHTML = "";
-
-      if (input.length > 0) {
-        let matches = ingredients.filter(item => item.toLowerCase().startsWith(input));
-
-        if (matches.length > 0) {
-          suggestionsDiv.style.display = "block";
-          matches.forEach(match => {
-            let div = document.createElement("div");
-            div.textContent = match;
-            div.onclick = function () {
-              document.getElementById("itemInput").value = match;
-              suggestionsDiv.style.display = "none";
-            };
-            suggestionsDiv.appendChild(div);
-          });
-        } else {
-          suggestionsDiv.style.display = "none";
-        }
-      } else {
-        suggestionsDiv.style.display = "none";
-      }
-    }
-
-    function addItem() {
-      let input = document.getElementById('itemInput');
-      let item = input.value.trim();
-      let suggestionsDiv = document.getElementById("suggestionsList");
-
-      if (item !== '') {
-        createListItem(item);
-        saveItem(item);
-        input.value = '';
-        suggestionsDiv.style.display = "none";
-      }
-    }
-
-    function createListItem(item) {
-      let li = document.createElement('li');
-
-      let checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.className = "checkbox";
-      checkbox.onclick = function() {
-        li.classList.toggle("checked", checkbox.checked);
-      };
-
-      let span = document.createElement("span");
-      span.textContent = item;
-
-      let btn = document.createElement('button');
-      btn.textContent = 'Supprimer';
-      btn.className = 'delete';
-      btn.onclick = function() {
-        removeItem(item);
-        li.remove();
-      };
-
-      li.appendChild(checkbox);
-      li.appendChild(span);
-      li.appendChild(btn);
-      document.getElementById('shoppingList').appendChild(li);
-    }
-
-    function saveItem(item) {
-      let items = JSON.parse(localStorage.getItem('shoppingList')) || [];
-      items.push(item);
-      localStorage.setItem('shoppingList', JSON.stringify(items));
-    }
-
-    function removeItem(item) {
-      let items = JSON.parse(localStorage.getItem('shoppingList')) || [];
-      let newItems = items.filter(i => i !== item);
-      localStorage.setItem('shoppingList', JSON.stringify(newItems));
-    }
-
-    function loadItems() {
-      let items = JSON.parse(localStorage.getItem('shoppingList')) || [];
-      items.forEach(createListItem);
-    }
-  </script>
-</body>
-</html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#b6b6b6"><title>Courses — liste de courses</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#b6b6b6;--card:#fff;--ink:#171717;--muted:#6c6c6c;--accent:#171717;--line:#dedede;--green:#2e7652}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+.page{max-width:1200px;margin:auto;padding:22px 20px 40px}.hero{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:22px;flex-wrap:wrap}
+.brand h1{font-size:clamp(42px,7vw,70px);font-weight:400;letter-spacing:2px;line-height:.9;margin:0}.brand p{font-family:cursive;font-style:italic;font-size:clamp(20px,3.4vw,34px);font-weight:300;margin:8px 0 0;letter-spacing:1px}
+.hero-note{font-size:13px;color:#333;max-width:240px;line-height:1.45}
+.toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;margin:0 0 18px}.search-wrap{position:relative;display:flex;gap:8px}.search-wrap input{width:100%;min-width:0;border:0;border-radius:16px;padding:15px 17px;font-size:16px;box-shadow:0 2px 8px #0000000d}.btn{border:0;border-radius:14px;padding:12px 16px;background:var(--accent);color:white;font-weight:700;cursor:pointer;font-size:14px}.btn.secondary{background:#fff;color:var(--ink)}.btn:active{transform:scale(.98)}
+.suggestions{display:none;position:absolute;top:calc(100% + 5px);left:0;right:0;background:white;border-radius:12px;box-shadow:0 8px 24px #0002;z-index:5;max-height:220px;overflow:auto;padding:5px}.suggestions button{display:block;width:100%;text-align:left;background:white;color:#222;border:0;padding:11px;border-radius:8px;cursor:pointer}.suggestions button:hover{background:#eee}
+.summary{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}.summary-text{font-size:14px;font-weight:700}.progress{height:6px;background:#ffffff9c;border-radius:20px;overflow:hidden;flex:1;min-width:90px;max-width:280px}.progress span{display:block;height:100%;width:0;background:var(--green);transition:width .2s}
+.layout{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start}.column{display:flex;flex-direction:column;gap:16px}.category{background:var(--card);border-radius:20px;padding:17px 17px 18px;min-width:0}.category h2{font-size:16px;letter-spacing:1.3px;text-align:center;margin:0 0 12px;font-weight:750}.food-list{display:grid;gap:7px}.food{display:flex;align-items:flex-start;gap:8px;font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.25;cursor:pointer}.food input{appearance:none;-webkit-appearance:none;flex:0 0 13px;width:13px;height:13px;border:1px solid #333;border-radius:50%;margin:1px 0 0;cursor:pointer;background:#fff}.food input:checked{background:#222;box-shadow:inset 0 0 0 3px white}.food span{overflow-wrap:anywhere}.food input:checked+span{color:#777;text-decoration:line-through}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:30px 0 12px}.section-head h2{margin:0;font-size:20px;letter-spacing:1px}.small-btn{border:1px solid #333;background:transparent;color:#111;border-radius:10px;padding:8px 10px;font-weight:700;cursor:pointer;font-size:12px}.shopping{background:white;border-radius:20px;padding:16px}.empty{color:var(--muted);text-align:center;padding:20px 10px;font-size:14px}.shop-list{display:grid;gap:8px}.shop-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;background:#f3f3f3}.shop-item input{width:18px;height:18px;accent-color:#222;flex:0 0 auto}.shop-name{flex:1;min-width:0;overflow-wrap:anywhere}.shop-item.done .shop-name{text-decoration:line-through;color:#777}.tag{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#777;display:block;margin-top:3px}.remove{border:0;background:transparent;color:#777;font-size:20px;cursor:pointer;padding:0 4px}.bottom-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.foot{font-size:12px;color:#333;text-align:center;margin:18px 0 0;line-height:1.5}
+@media(max-width:900px){.layout{grid-template-columns:repeat(3,minmax(0,1fr))}.hero-note{max-width:300px}}
+@media(max-width:650px){.page{padding:17px 12px 30px}.hero{margin-bottom:18px}.hero-note{display:none}.layout{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.column{gap:10px}.category{padding:14px 12px 15px;border-radius:16px}.category h2{font-size:14px;letter-spacing:1px}.food-list{gap:8px}.food{font-size:12px}.toolbar{grid-template-columns:1fr}.toolbar>.btn{width:100%}.section-head h2{font-size:17px}}
+@media(max-width:380px){.layout{grid-template-columns:1fr}.column{display:contents}.category{margin-bottom:0}.brand h1{font-size:43px}.brand p{font-size:22px}}
+</style></head>
+<body><main class="page">
+<header class="hero"><div class="brand"><h1>Courses</h1><p>liste de courses</p></div><div class="hero-note">Coche tes produits habituels, ajoute les articles spéciaux avec la recherche, puis coche-les en magasin.</div></header>
+<section class="toolbar" aria-label="Ajouter un produit"><div class="search-wrap"><input id="search" type="search" placeholder="Rechercher ou ajouter un produit…" autocomplete="off" aria-label="Rechercher ou ajouter un produit"><div id="suggestions" class="suggestions"></div></div><button id="addCustom" class="btn">＋ Ajouter à la liste</button></section>
+<div class="summary"><div id="summaryText" class="summary-text">0 produit dans la liste</div><div class="progress" aria-label="Progression des courses"><span id="progressBar"></span></div><button id="addSelected" class="btn secondary">Ajouter les produits cochés</button></div>
+<section id="categories" class="layout" aria-label="Produits habituels"></section>
+<section class="section-head"><h2>MA LISTE EN MAGASIN</h2><button id="clearBought" class="small-btn">Retirer les produits achetés</button></section>
+<section class="shopping"><div id="shopList" class="shop-list"></div><div id="emptyState" class="empty">Ta liste est vide. Coche les produits habituels ou ajoute un article avec la recherche.</div><div class="bottom-actions"><button id="uncheckAll" class="small-btn">Tout décocher</button><button id="clearAll" class="small-btn">Vider la liste</button></div></section>
+<p class="foot">Ta sélection est sauvegardée automatiquement sur cet appareil. Pour une nouvelle liste mensuelle, retire les produits achetés ou vide la liste.</p>
+</main>
+<script>
+const categories=[
+{name:'CRÈMERIE',items:['Yaourt','Parmesan','Gruyère','Lait','Œufs','Crème liquide','Crème fraîche','Fromage','Beurre','Mozzarella','Féta','Pâte feuilletée','Pâte brisée']},
+{name:'FÉCULENTS',items:['Spaghettis','Tagliatelles','Coquillettes','Fusilli','Coudes','Penne','Pâtes fraîche','Riz basmati','Riz thaï','Riz risoto','Lentilles','Semoules','Purée']},
+{name:'LÉGUMES',items:['Pomme de terre','Salade','Courgette','Concombre','Tomate cerise','Tomate','Poivron','Poireaux','Aubergine','Oignons','Pois chiche','Brocoli','Épinards']},
+{name:'FRUITS',items:['Avocat','Abricots','Cerises','Mangue','Orange','Melon','Pêches','Pommes','Kiwis','Pastèque','Framboises','Poires','Bananes']},
+{name:'PETIT DÉJEUNER',items:['Café','Thé','Brioche','Biscottes','Céréales','Confiture','Nutella','Jus','Eau gazeuse citron']},
+{name:'SURGELER',items:['Poisson pané','Colin','Steak','Frites','Légumes','Pizza','Fruit','Glaces']},
+{name:'CONSERVES',items:['Haricot rouge/blanc','Haricots verts','Ravioli','Ratatouille','Champignon','Tomate pelé','Maïs','Cassoulet','Macédoine','Petit pois Carottes']},
+{name:'VIANDES',items:['Blanc poulet','Cuisse de poulet','Cordon bleu','Jambon','Lardons','Côtelettes de porc','Steak haché','Paupiette','Saucisse','Merguez','Saumon','Surimi','Crevette']},
+{name:'DIVERS',items:['Sauce tomate','Mayonnaise','Huile d’olive','Farine','Olives','Sucre vanille','Chips','Apéro','Vinaigre','Levure boulangère','Levure chimique','Sucre blanc','Sucre roux','Bouillon cube','Tablette chocolat','Oignons frit','Arôme vanille','Crème balsamique']}
+];
+const storeKey='coursesCombineesV1'; let state={items:[],selected:[]};
+const oldKey='shoppingList';
+function load(){try{const saved=JSON.parse(localStorage.getItem(storeKey));if(saved&&Array.isArray(saved.items)){state=saved;return}}catch(e){};try{const old=JSON.parse(localStorage.getItem(oldKey))||[];state.items=old.map((name,i)=>({id:'old-'+i+'-'+Date.now(),name,done:false,source:'custom'}))}catch(e){} }
+function save(){localStorage.setItem(storeKey,JSON.stringify(state));renderShop();updateSummary()}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderCategories(){const root=document.getElementById('categories');root.innerHTML='';const columns=[[categories[0],categories[2]],[categories[1],categories[3]],[categories[4],categories[5],categories[6]],[categories[7],categories[8]]];columns.forEach(col=>{const wrap=document.createElement('div');wrap.className='column';col.forEach(cat=>{const card=document.createElement('article');card.className='category';card.innerHTML=`<h2>${escapeHtml(cat.name)}</h2><div class="food-list">${cat.items.map(item=>`<label class="food"><input type="checkbox" data-food="${escapeHtml(item)}"><span>${escapeHtml(item)}</span></label>`).join('')}</div>`;wrap.appendChild(card)});root.appendChild(wrap)});}
+function addItem(name,source='custom'){name=name.trim();if(!name)return;const existing=state.items.find(x=>x.name.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'));if(existing){existing.done=false}else{state.items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),name,done:false,source})}save()}
+function renderShop(){const list=document.getElementById('shopList');list.innerHTML='';document.getElementById('emptyState').style.display=state.items.length?'none':'block';state.items.forEach(item=>{const row=document.createElement('div');row.className='shop-item'+(item.done?' done':'');row.innerHTML=`<input type="checkbox" aria-label="Produit acheté" ${item.done?'checked':''}><div class="shop-name">${escapeHtml(item.name)}${item.source==='custom'?'<span class="tag">Ajout personnalisé</span>':''}</div><button class="remove" aria-label="Supprimer '+escapeHtml(item.name)+'" title="Supprimer">×</button>`;row.querySelector('input').addEventListener('change',e=>{item.done=e.target.checked;save()});row.querySelector('.remove').addEventListener('click',()=>{state.items=state.items.filter(x=>x.id!==item.id);save()});list.appendChild(row)})}
+function updateSummary(){const total=state.items.length,done=state.items.filter(x=>x.done).length;document.getElementById('summaryText').textContent=total?`${done} / ${total} produit${total>1?'s':''} acheté${done>1?'s':''}`:'0 produit dans la liste';document.getElementById('progressBar').style.width=(total?done/total*100:0)+'%'}
+function addSelected(){const checked=[...document.querySelectorAll('[data-food]:checked')];checked.forEach(el=>{addItem(el.dataset.food,'usual');el.checked=false});if(checked.length){document.getElementById('shopList').scrollIntoView({behavior:'smooth',block:'start'})}}
+function suggestions(){const q=document.getElementById('search').value.trim().toLocaleLowerCase('fr');const box=document.getElementById('suggestions');box.innerHTML='';if(!q){box.style.display='none';return}const all=[...new Set([...categories.flatMap(c=>c.items),...['Ail','Ananas','Carotte','Citron','Moutarde','Pain','Miel','Sel','Poivre','Dentifrice','Shampoing','Lessive','Papier toilette','Produit vaisselle']])];const found=all.filter(x=>x.toLocaleLowerCase('fr').includes(q)).slice(0,8);if(!found.length){box.style.display='none';return}found.forEach(name=>{const b=document.createElement('button');b.type='button';b.textContent=name;b.addEventListener('click',()=>{document.getElementById('search').value=name;box.style.display='none';addItem(name,'custom');document.getElementById('search').value=''});box.appendChild(b)});box.style.display='block'}
+document.getElementById('addSelected').addEventListener('click',addSelected);
+document.getElementById('addCustom').addEventListener('click',()=>{const input=document.getElementById('search');if(input.value.trim()){addItem(input.value,'custom');input.value='';document.getElementById('suggestions').style.display='none';input.focus()}});
+document.getElementById('search').addEventListener('input',suggestions);document.getElementById('search').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('addCustom').click()}});document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))document.getElementById('suggestions').style.display='none'});
+document.getElementById('clearBought').addEventListener('click',()=>{state.items=state.items.filter(x=>!x.done);save()});document.getElementById('clearAll').addEventListener('click',()=>{if(confirm('Vider toute la liste de courses ?')){state.items=[];save()}});document.getElementById('uncheckAll').addEventListener('click',()=>{state.items.forEach(x=>x.done=false);save()});
+load();renderCategories();renderShop();updateSummary();
+if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>
