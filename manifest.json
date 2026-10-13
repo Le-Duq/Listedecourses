@@ -1,0 +1,9 @@
+{
+  "name": "Courses — liste de courses",
+  "short_name": "Courses",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#b6b6b6",
+  "theme_color": "#b6b6b6",
+  "description": "Liste de courses avec produits habituels et ajout personnalisé."
+}
